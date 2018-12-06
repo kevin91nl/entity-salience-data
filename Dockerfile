@@ -8,3 +8,4 @@ RUN python -m nltk.downloader punkt
 RUN fix-permissions $CONDA_DIR
 RUN fix-permissions /home/$NB_USER
 RUN fix-permissions /home/$NB_USER/work
+
