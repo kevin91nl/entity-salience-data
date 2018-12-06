@@ -6,13 +6,13 @@ This repository contains the code for my Master Thesis which is about salient en
 
 ## Usage
 
-A Docker image is available for the reproducability of the results. Run the following command from the project root folder to launch the container with Jupyter Labs:
+A Docker image is available for the reproducability of the results. Run the following command to launch the container with Jupyter Lab:
 
 ```bash
-docker run --rm -it -p 8888:8888 kevin91nl/entity-salience jupyter lab --NotebookApp.password='sha1:27d24f1d74bd:65b1a0275d5adcd10bcb806c0a30778ce8fe76cd'
+docker run --rm -it -p 8888:8888 kevin91nl/entity-salience jupyter lab
 ```
 
-Jupyter Labs should be accessible on `localhost:8888` with the password `jupyter`.
+Jupyter Lab should be accessible on port `8888` with the password `jupyter`. The project related files are found in the `work` folder.
 
 Please consult the several stand-alone notebooks in the `notebooks` folder in which several entity salience detection algorithms are explained. The goals of the notebooks are explained in the "Notebooks" section.
 
