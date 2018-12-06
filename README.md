@@ -1,5 +1,7 @@
 # Entity salience detection
 
+[![Docker Build Status](https://img.shields.io/docker/build/kevin91nl/entity-salience.svg)](https://hub.docker.com/r/kevin91nl/entity-salience/)
+
 ## Usage
 
 A Docker image is available for the reproducability of the results. Run the following command from the project root folder to launch the container with Jupyter Labs:
