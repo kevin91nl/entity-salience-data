@@ -2,12 +2,14 @@
 
 [![Docker Build Status](https://img.shields.io/docker/build/kevin91nl/entity-salience.svg)](https://hub.docker.com/r/kevin91nl/entity-salience/)
 
+This repository contains the code for my Master Thesis which is about salient entity detection in documents.
+
 ## Usage
 
 A Docker image is available for the reproducability of the results. Run the following command from the project root folder to launch the container with Jupyter Labs:
 
 ```bash
-docker run --rm -it -v ${PWD}:/home/jovyan/work -p 8888:8888 kevin91nl/entity-salience jupyter lab --NotebookApp.password='sha1:27d24f1d74bd:65b1a0275d5adcd10bcb806c0a30778ce8fe76cd'
+docker run --rm -it -p 8888:8888 kevin91nl/entity-salience jupyter lab --NotebookApp.password='sha1:27d24f1d74bd:65b1a0275d5adcd10bcb806c0a30778ce8fe76cd'
 ```
 
 Jupyter Labs should be accessible on `localhost:8888` with the password `jupyter`.
@@ -34,3 +36,13 @@ Here, phrase extraction is the task in which all non-overlapping phrases (word s
 
 In this section, the data files are explained and the sources of the data files are explained.
 
+### WikiPhrase
+
+The WikiPhrase dataset is explained in the thesis. The WikiPhrase dataset augments the WikiNews dataset which is found [here](https://github.com/dexter/dexter-datasets/tree/master/entity-saliency). The `wikinews-docs.json` file contains a subset of the documents of WikiNews, namely all the documents which are augmented by the annotations in the WikiPhrase dataset. The `wikinews-entities.json` file contains the entities and saliency information of the entities of these documents. The `annotations.csv` file contains the annotations made for the WikiPhrase dataset in which phrases are selected in the WikiNews documents. The last file is the `wikipedia-entities.json` file. This file contains summaries found on Wikipedia found for the given entities. All this information is combined and loaded by the `load_dataset` method.
+
+## Contact
+
+I am Kevin Jacobs, Data Scientist. I am interested mainly in NLP and other topics related to Artificial Intelligence and Machine Learning. Feel free to contact me about any of these topics or with any other question. I can be reached at:
+- [Twitter](https://twitter.com/kmjjacobs)
+- [LinkedIn](https://www.linkedin.com/in/kevinjacobs1991/)
+- [My blog](https://www.data-blogger.com/)
