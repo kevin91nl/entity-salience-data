@@ -42,7 +42,7 @@ The WikiPhrase dataset is explained in the thesis. The WikiPhrase dataset augmen
 
 ## Contact
 
-I am Kevin Jacobs, a Dutch Data Scientist. I am interested mainly in NLP and other topics related to Artificial Intelligence and Machine Learning. Feel free to contact me about any of these topics or with any other question. I can be reached at:
+I am Kevin Jacobs, a Dutch Data Scientist. I am mainly interested in NLP and other topics related to Artificial Intelligence and Machine Learning. Feel free to contact me about any of these topics or with any other question. I can be reached at:
 - [Twitter](https://twitter.com/kmjjacobs)
 - [LinkedIn](https://www.linkedin.com/in/kevinjacobs1991/)
 - [My blog](https://www.data-blogger.com/)
