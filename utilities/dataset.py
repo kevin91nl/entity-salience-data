@@ -23,7 +23,6 @@ def load_dataset(base_path):
     df_annotations = pd.merge(df_annotations, df_docs, on='doc_id', how='inner')
     df_annotations = pd.merge(df_annotations, df_wikipedia, on='entity', how='outer')
     df_annotations = pd.merge(df_annotations, df_entities, on=['doc_id', 'entity'], how='inner')
-    df_annotations = df_annotations.set_index(['doc_id', 'entity'])
     return df_annotations
 
 def generate_embeddings(tokens, embedding_size, random_seed=0):
@@ -91,12 +90,10 @@ class LowercaseTransformer:
             
 class Tokenizer:
     
-    def __init__(self, embeddings, subtokenizer, transformers=[], add_start_token=True, add_end_token=True):
+    def __init__(self, embeddings, subtokenizer, transformers=[]):
         self.embeddings = embeddings
         self.tokenizer = subtokenizer
         self.transformers = transformers
-        self.add_start_token = add_start_token
-        self.add_end_token = add_end_token
         
     def normalize(self, token):
         normalized_token = token
@@ -104,13 +101,13 @@ class Tokenizer:
             normalized_token = transformer(normalized_token)
         return normalized_token
     
-    def __call__(self, text):
+    def __call__(self, text, add_start_token=True, add_end_token=True):
         tokens = self.tokenizer(text)
         normalized_tokens = [self.normalize(token) for token in tokens]
-        if self.add_start_token:
+        if add_start_token:
             tokens = ['__START__'] + tokens
             normalized_tokens = ['__START__'] + normalized_tokens
-        if self.add_end_token:
+        if add_end_token:
             tokens = tokens + ['__END__']
             normalized_tokens = normalized_tokens + ['__END__']
         ids = [self.embeddings.lookup(token) for token in normalized_tokens]
@@ -144,3 +141,65 @@ class TextEncoder:
                     output['{}__char_tokens'.format(text_label)] = [output['normalized_tokens'] for output in char_tokenizer_output]
                     output['{}__char_ids'.format(text_label)] = [np.array(output['ids']).astype('i') for output in char_tokenizer_output]
         return output
+    
+def compute_phrase_mask(text, phrases, word_tokenizer):
+    text_tokens = word_tokenizer(text, add_start_token=True, add_end_token=True)['normalized_tokens']
+    start_positions = []
+    mask = [0 for _ in range(len(text_tokens))]
+    for phrase in phrases:
+        phrase_tokens = word_tokenizer(phrase, add_start_token=False, add_end_token=False)['normalized_tokens']
+        for i in range(len(text_tokens) - len(phrase_tokens) + 1):
+            found = True if len(phrase_tokens) > 0 else False
+            for j in range(len(phrase_tokens)):
+                if text_tokens[i + j] != phrase_tokens[j]:
+                    found = False
+                    continue
+            if found:
+                start_positions.append(i)
+                for j in range(len(phrase_tokens)):
+                    mask[i + j] = 1
+    for start_position in start_positions:
+        mask[start_position] = 2
+    return np.array(mask).astype('i')
+
+def create_wikiphrase_dataset(df, text_encoder):
+    items = []
+    for doc_id in df.doc_id.sort_values().unique():
+        df_selected = df[df.doc_id == doc_id]
+        doc_text = df_selected.text.iloc[0]
+        doc_data = text_encoder(text=doc_text)
+        for annotator in df_selected.annotator.sort_values().unique():
+            df_selected = df_selected[df.annotator == annotator]
+            for entity in df_selected.entity.sort_values().unique():
+                df_selected = df_selected[df.entity == entity]
+
+                if len(df_selected) == 0:
+                    continue
+
+                kb_text = str(df_selected.wikipedia_text_short.iloc[0])
+                kb_data = text_encoder(kb=kb_text)
+
+                entity_data = text_encoder(entity=df_selected.entity.iloc[0])
+                entity_metadata = {
+                'salience': df_selected.salience.iloc[0]
+                }
+
+                phrase_mask = compute_phrase_mask(doc_text, df_selected.phrase.values.tolist(), text_encoder.word_tokenizer)
+                phrase_metadata = {
+                'phrase_mask': phrase_mask
+                }
+
+                row = {}
+                row.update(doc_data)
+                row.update(entity_data)
+                row.update(kb_data)
+                row.update(entity_metadata)
+                row.update(phrase_metadata)
+                row.update({
+                'text': doc_text,
+                'annotator': annotator,
+                'kb': kb_text,
+                'entity': entity
+                })
+                items.append(row)
+    return pd.DataFrame(items)
